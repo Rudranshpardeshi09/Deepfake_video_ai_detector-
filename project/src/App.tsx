@@ -528,7 +528,7 @@ import "./App.css";
 import NavBar from "./components/navbar/nav";
 import Footer from "./components/footer/footer";
 import Home from "./components/home/home";
-import {VideoUploader} from "./components/video_uploader/VideoUploader";
+import CheckSection from "./components/check/check";
 
 
 const App: React.FC = () => {
@@ -541,13 +541,7 @@ const App: React.FC = () => {
         {activeTab === "home" ? (
           <Home setActiveTab={setActiveTab} />
         ) : (
-          <div className="check-section">
-            <VideoUploader onVideoSelect={(url, file) => {
-  // handle the selected video here
-}} />
-            <h2>Check Video Section</h2>
-            <p>Upload and analyze your video here.</p>
-          </div>
+          <CheckSection/> // Use Check component instead of VideoUploader
         )}
       </main>
       <Footer />
