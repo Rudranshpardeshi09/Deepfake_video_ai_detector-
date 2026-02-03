@@ -203,42 +203,68 @@
 
 // export default CheckSection;
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { VideoAnalyzer } from "../video_analyzer/VideoAnalyzer";
 import { VideoUploader } from "../video_uploader/VideoUploader";
-import type { VideoDetails } from "../../types";
+import { getAnalyzeUrl } from "../../config";
+import type { VideoDetails, DetectionResult } from "../../types";
 
 const CheckSection: React.FC = () => {
   const [video, setVideo] = useState<VideoDetails | null>(null);
 
-  const handleVideoSelect = (url: string, file: File) => {
+  const handleVideoSelect = useCallback((url: string, file: File) => {
     setVideo({ url, file, status: "idle" });
-  };
+  }, []);
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = useCallback(async () => {
     if (!video?.file) return;
-    setVideo((prev) => prev && { ...prev, status: "analyzing" });
+    setVideo((prev) => prev ? { ...prev, status: "analyzing" } : null);
 
     try {
       const formData = new FormData();
       formData.append("video", video.file);
 
-      const response = await fetch("http://localhost:3000/api/analyze", {
+      const response = await fetch(getAnalyzeUrl(), {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Server error: " + response.statusText);
-      const result = await response.json();
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const errorMessage =
+          typeof data?.error === "string"
+            ? data.error
+            : typeof data?.detail === "string"
+              ? data.detail
+              : Array.isArray(data?.detail)
+                ? data.detail.map((d: { msg?: string }) => d.msg).join(", ")
+                : "Analysis failed. Please try again.";
+        setVideo((prev) =>
+          prev ? { ...prev, status: "error", result: { error: errorMessage } as DetectionResult } : null
+        );
+        return;
+      }
+
+      if (data?.error) {
+        setVideo((prev) =>
+          prev ? { ...prev, status: "error", result: { ...data } as DetectionResult } : null
+        );
+        return;
+      }
 
       setVideo((prev) =>
-        prev && { ...prev, status: "completed", result }
+        prev ? { ...prev, status: "completed", result: data as DetectionResult } : null
       );
-    } catch (error) {
-      console.error("Error analyzing video:", error);
-      setVideo((prev) => prev && { ...prev, status: "error" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Network error. Please try again.";
+      setVideo((prev) =>
+        prev
+          ? { ...prev, status: "error", result: { error: message } as DetectionResult }
+          : null
+      );
     }
-  };
+  }, [video?.file]);
 
   return (
     <section className="check-section">

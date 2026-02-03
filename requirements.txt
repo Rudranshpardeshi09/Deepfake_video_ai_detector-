@@ -1,0 +1,5 @@
+# DeepGuard AI - single project requirements (use with venv at project root)
+# Install: python -m venv venv && venv\Scripts\activate (Windows) or source venv/bin/activate (Unix)
+# Then: pip install -r requirements.txt
+
+-r backend/requirements.txt

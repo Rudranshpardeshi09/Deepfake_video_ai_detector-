@@ -2,6 +2,8 @@ export interface DetectionResult {
   isDeepfake: boolean;
   confidence: number;
   analyzedAt: string;
+  mode?: string;
+  error?: string;
   regions?: {
     x: number;
     y: number;

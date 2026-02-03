@@ -1,0 +1,29 @@
+# Virtual environment
+venv
+.venv
+env
+
+# Python
+__pycache__
+*.py[cod]
+*.pyo
+.Python
+*.so
+.eggs
+*.egg-info
+dist
+build
+
+# Backend uploads (temporary)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE / OS
+.idea
+.vscode
+.DS_Store
+*.local
+
+# Logs
+*.log
+logs

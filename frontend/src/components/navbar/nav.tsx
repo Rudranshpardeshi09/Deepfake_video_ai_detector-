@@ -18,7 +18,7 @@ const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
             className={`nav-link ${activeTab === "home" ? "active" : ""}`}
             onClick={() => setActiveTab("home")}
           >
-            Homeee
+            Home
           </button>
           <button
             className={`nav-link ${activeTab === "check" ? "active" : ""}`}
