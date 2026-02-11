@@ -1,0 +1,843 @@
+/**
+ * Global styles for AI-generated video detection system.
+ *
+ * This file contains all global CSS including:
+ * - CSS custom properties (theme variables)
+ * - Base element styles
+ * - Animation keyframes
+ * - Responsive design breakpoints
+ * - Utility classes
+ *
+ * The design follows a mobile-first approach and uses the Gradient Vibrant theme.
+ */
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ============================================================================= */
+
+:root {
+  /* Rainbow ROY G BIV theme colors */
+  --primary-start: #ff0000;         /* Red */
+  --primary-mid: #9400d3;           /* Violet */
+  --primary-end: #00ffff;           /* Cyan */
+
+  /* Rainbow spectrum colors for animation cycling */
+  --spectrum-red: #ff0000;
+  --spectrum-orange: #ff7f00;
+  --spectrum-yellow: #ffff00;
+  --spectrum-green: #00ff00;
+  --spectrum-blue: #0000ff;
+  --spectrum-indigo: #4b0082;
+  --spectrum-violet: #9400d3;
+  --spectrum-pink: #ff1493;
+  --spectrum-cyan: #00ffff;
+
+  /* Detection indicator colors (unique color per indicator) */
+  --indicator-sharpness: #0000ff;   /* Blue */
+  --indicator-compression: #ff7f00; /* Orange */
+  --indicator-optical-flow: #00ff00; /* Green */
+  --indicator-frequency: #9400d3;   /* Violet */
+  --indicator-entropy: #ff1493;     /* Pink */
+
+  /* Dark gradient background */
+  --dark-gradient-start: #0a0e27;
+  --dark-gradient-mid: #1e1b4b;
+  --dark-gradient-end: #2d1b4b;
+
+  /* Text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+
+  /* Background colors */
+  --bg-dark: #0f172a;
+  --bg-darker: #0a0e27;
+  --bg-light: #f3f4f6;
+
+  /* Status colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #0000ff;
+
+  /* Risk level colors */
+  --risk-low: #10b981;      /* Green */
+  --risk-medium: #f59e0b;   /* Amber */
+  --risk-high: #ef4444;     /* Red */
+
+  /* Accent colors */
+  --accent-cyan: #00ffff;
+  --accent-amber: #fbbf24;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  /* Rainbow glow: cycles through spectrum */
+  --shadow-glow: 0 0 20px rgba(255, 0, 0, 0.3);
+  --shadow-glow-strong: 0 0 40px rgba(255, 0, 0, 0.5);
+
+  /* Transitions */
+  --transition-fast: 150ms ease-out;
+  --transition-base: 300ms ease-out;
+  --transition-slow: 600ms ease-out;
+
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* Spacing (8px base unit) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Menlo, "Courier New", monospace;
+
+  /* Z-index scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal: 1040;
+  --z-popover: 1050;
+  --z-tooltip: 1060;
+}
+
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* Enable smooth scrolling */
+  scroll-behavior: smooth;
+  /* Prevent font size adjustments on rotation */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  /* Base typography */
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--dark-gradient-start) 0%, var(--dark-gradient-mid) 50%, var(--dark-gradient-end) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+
+  /* Text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* =============================================================================
+   TYPOGRAPHY
+   ============================================================================= */
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+h1 {
+  font-size: 2.25rem;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.875rem;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+h5 {
+  font-size: 1.125rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+p {
+  margin-bottom: var(--space-4);
+}
+
+a {
+  color: var(--primary-start);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-end);
+  text-decoration: underline;
+}
+
+code {
+  font-family: var(--font-mono);
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.875em;
+}
+
+/* =============================================================================
+   BUTTONS AND INPUTS
+   ============================================================================= */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: all var(--transition-fast);
+}
+
+input[type="file"],
+input[type="text"],
+input[type="email"],
+textarea,
+select {
+  font-family: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+input[type="file"]:hover,
+input[type="text"]:hover,
+input[type="email"]:hover,
+textarea:hover,
+select:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+input[type="file"]:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-start);
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* =============================================================================
+   ANIMATIONS AND TRANSITIONS
+   ============================================================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Rainbow gradient color animation - cycles through spectrum colors */
+@keyframes rainbowGradientShift {
+  0% {
+    background: linear-gradient(135deg, var(--spectrum-red), var(--spectrum-violet), var(--spectrum-cyan));
+    background-size: 400% 400%;
+    background-position: 0% 50%;
+  }
+  25% {
+    background: linear-gradient(135deg, var(--spectrum-orange), var(--spectrum-blue), var(--spectrum-red));
+    background-position: 25% 50%;
+  }
+  50% {
+    background: linear-gradient(135deg, var(--spectrum-yellow), var(--spectrum-indigo), var(--spectrum-orange));
+    background-position: 50% 50%;
+  }
+  75% {
+    background: linear-gradient(135deg, var(--spectrum-green), var(--spectrum-violet), var(--spectrum-yellow));
+    background-position: 75% 50%;
+  }
+  100% {
+    background: linear-gradient(135deg, var(--spectrum-red), var(--spectrum-violet), var(--spectrum-cyan));
+    background-position: 100% 50%;
+  }
+}
+
+/* Rainbow color pulse - glow effect with spectrum colors */
+@keyframes rainbowGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3), inset 0 0 10px rgba(255, 0, 0, 0.1);
+  }
+  25% {
+    box-shadow: 0 0 20px rgba(255, 127, 0, 0.5), inset 0 0 10px rgba(255, 127, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 0, 255, 0.6), inset 0 0 15px rgba(255, 0, 255, 0.3);
+  }
+  75% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3), inset 0 0 10px rgba(255, 0, 0, 0.1);
+  }
+}
+
+/* Bounce animation - confidence meter success state */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Bounce with scale for card entry animations */
+@keyframes bounceScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Pulsing glow for progress indicators */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+  }
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+
+/* Display utilities */
+.hidden {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+}
+
+/* Spacing utilities */
+.m-auto {
+  margin: auto;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.py-auto {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+/* Text utilities */
+.text-center {
+  text-align: center;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+/* Shadow utilities */
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Border utilities */
+.rounded {
+  border-radius: var(--radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+.rounded-xl {
+  border-radius: var(--radius-xl);
+}
+
+/* Gradient utilities */
+.gradient-vibrant {
+  background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-mid) 50%, var(--primary-end) 100%);
+}
+
+.gradient-dark {
+  background: linear-gradient(135deg, var(--dark-gradient-start) 0%, var(--dark-gradient-mid) 50%, var(--dark-gradient-end) 100%);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Loading animation */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Animations */
+.animate-fadeIn {
+  animation: fadeIn var(--transition-base) ease-out;
+}
+
+.animate-slideInUp {
+  animation: slideInUp var(--transition-base) ease-out;
+}
+
+.animate-slideInDown {
+  animation: slideInDown var(--transition-base) ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft var(--transition-base) ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight var(--transition-base) ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Rainbow animation utilities */
+.animate-rainbow-gradient {
+  animation: rainbowGradientShift 6s ease-in-out infinite;
+}
+
+.animate-rainbow-glow {
+  animation: rainbowGlow 4s ease-in-out infinite;
+}
+
+.animate-bounce {
+  animation: bounce 0.6s cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.animate-bounce-scale {
+  animation: bounceScale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN - MOBILE FIRST
+   ============================================================================= */
+
+/* Mobile-first base styles (320px+) - optimized for small screens */
+
+/* Ensure all interactive elements meet 48px minimum touch target on mobile */
+button,
+input[type="submit"],
+input[type="button"],
+input[type="checkbox"],
+input[type="radio"],
+.clickable,
+a {
+  min-height: 44px;
+  min-width: 44px;
+  padding: max(var(--space-2), calc((44px - 1em) / 2)) var(--space-3);
+}
+
+/* Better spacing on mobile devices */
+body {
+  padding: var(--space-4);
+}
+
+/* Stack layouts vertically on mobile */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+/* Improve readability on small screens */
+p {
+  line-height: 1.6;
+  margin-bottom: var(--space-3);
+}
+
+/* Better touch targets on mobile */
+label {
+  display: block;
+  margin-bottom: var(--space-2);
+  cursor: pointer;
+}
+
+/* Reduce font size scaling on very small screens */
+html {
+  font-size: 14px;
+}
+
+/* Improve video player on mobile */
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Small devices (640px+) */
+@media (min-width: 640px) {
+  html {
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  body {
+    padding: var(--space-6);
+  }
+
+  .grid-responsive {
+    gap: var(--space-6);
+  }
+}
+
+/* Tablets (768px+) */
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 2.75rem;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  body {
+    font-size: 1rem;
+    padding: var(--space-8);
+  }
+
+  /* Start using 2-column grids at tablet size */
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8);
+  }
+
+  /* Larger touch targets on tablets */
+  button,
+  input[type="submit"],
+  a {
+    min-height: 48px;
+  }
+}
+
+/* Desktops (1024px+) */
+@media (min-width: 1024px) {
+  h1 {
+    font-size: 3rem;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+  }
+
+  h3 {
+    font-size: 2rem;
+  }
+
+  body {
+    padding: var(--space-12);
+  }
+
+  /* 3-column grids on desktop */
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+}
+
+/* Large screens (1280px+) */
+@media (min-width: 1280px) {
+  h1 {
+    font-size: 3.5rem;
+  }
+
+  h2 {
+    font-size: 3rem;
+  }
+
+  h3 {
+    font-size: 2.25rem;
+  }
+}
+
+/* Extra large screens (1536px+) */
+@media (min-width: 1536px) {
+  h1 {
+    font-size: 4rem;
+  }
+
+  h2 {
+    font-size: 3.5rem;
+  }
+
+  h3 {
+    font-size: 2.5rem;
+  }
+}
+
+/* =============================================================================
+   PRINT STYLES
+   ============================================================================= */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  button {
+    display: none;
+  }
+}

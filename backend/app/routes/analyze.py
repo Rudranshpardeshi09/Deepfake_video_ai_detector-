@@ -1,4 +1,10 @@
-"""Video upload and analysis API."""
+"""
+Video upload and AI-generation analysis API.
+
+This module defines the REST API endpoints for video upload and detection.
+It handles file validation, temporary storage, and returns analysis results
+in a user-friendly JSON format.
+"""
 from __future__ import annotations
 
 import logging
@@ -9,6 +15,7 @@ from pathlib import Path
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.config import UPLOAD_DIR, MAX_VIDEO_SIZE_MB
+from app.exceptions import VideoProcessingError, NoFramesExtractedError
 from app.services.video_analysis import analyze_video
 
 logger = logging.getLogger(__name__)
@@ -18,47 +25,137 @@ MAX_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024
 
 
 @router.post("/analyze")
-async def analyze_uploaded_video(video: UploadFile = File(..., description="Video file")):
+async def analyze_uploaded_video(video: UploadFile = File(..., description="Video file to analyze")):
     """
-    Upload a video and run deepfake analysis.
-    Returns isDeepfake, confidence, analyzedAt.
-    """
-    if not video.filename or not video.filename.lower().endswith((".mp4", ".webm", ".mov", ".avi", ".mkv")):
-        raise HTTPException(status_code=400, detail="Invalid or missing video file (use MP4, WebM, MOV, AVI, MKV)")
+    Upload a video and analyze it for AI-generated content.
 
-    content = await video.read()
+    This endpoint accepts video uploads and returns a comprehensive analysis result
+    including confidence score, risk level (low/medium/high), and per-indicator scores.
+
+    Request:
+        - Content-Type: multipart/form-data
+        - Parameter: video (file upload, MP4/WebM/MOV/AVI/MKV, max 100MB)
+
+    Response:
+        {
+            "isAIGenerated": bool,           # Primary classification result
+            "confidence": float,              # Confidence [0.0-1.0]
+            "riskLevel": "low|medium|high",  # Human-readable risk indicator
+            "detectionMethod": "heuristic|model|ensemble",  # Which method was used
+            "frameCount": int,                # Number of frames analyzed
+            "processingTime": float,          # Analysis time in seconds
+            "analyzedAt": string,             # ISO 8601 timestamp
+            "detailBreakdown": {              # Detailed indicator scores
+                "sharpness_score": float,
+                "compression_score": float,
+                "optical_flow_score": float,
+                "frequency_score": float,
+                ...
+            }
+        }
+
+    Status Codes:
+        - 200: Success - analysis complete
+        - 400: Bad request - invalid file or format
+        - 500: Server error - analysis failed
+
+    Args:
+        video: Uploaded video file
+
+    Raises:
+        HTTPException: 400 if file is invalid, 500 if analysis fails
+    """
+    # Validate file exists and has content
+    if not video.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    # Extract and validate file extension
+    # We check extension early to avoid wasting time on invalid files
+    filename_lower = video.filename.lower()
+    supported_extensions = (".mp4", ".webm", ".mov", ".avi", ".mkv")
+
+    if not filename_lower.endswith(supported_extensions):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported video format. Supported: {', '.join(supported_extensions)}",
+        )
+
+    # Read file content
+    try:
+        content = await video.read()
+    except Exception as e:
+        logger.error(f"Error reading uploaded file: {e}")
+        raise HTTPException(status_code=400, detail="Could not read uploaded file")
+
+    # Validate file is not empty
+    if len(content) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+    # Validate file size (prevent memory exhaustion)
     if len(content) > MAX_BYTES:
         raise HTTPException(
             status_code=400,
-            detail=f"Video too large. Maximum size is {MAX_VIDEO_SIZE_MB}MB.",
+            detail=f"Video file too large ({ len(content) / 1024 / 1024:.1f}MB). Maximum: {MAX_VIDEO_SIZE_MB}MB",
         )
-    if len(content) == 0:
-        raise HTTPException(status_code=400, detail="Empty file")
 
+    # Create temporary file with unique name
+    # UUID prevents filename collisions if multiple uploads occur simultaneously
     suffix = Path(video.filename).suffix or ".mp4"
     safe_name = f"{uuid.uuid4().hex}{suffix}"
     file_path = UPLOAD_DIR / safe_name
 
     try:
+        # Write uploaded content to temporary file
         file_path.write_bytes(content)
-        result = analyze_video(file_path)
+
+        # Run analysis
+        try:
+            result = analyze_video(file_path)
+        except (VideoProcessingError, NoFramesExtractedError) as e:
+            # Expected error during video processing
+            logger.warning(f"Video processing error: {e}")
+            raise HTTPException(status_code=400, detail=f"Invalid video: {str(e)}")
+
+        # Get current timestamp (ISO 8601 format)
         analyzed_at = datetime.now(timezone.utc).isoformat()
-        return {
-            "isDeepfake": result.is_deepfake,
+
+        # Build response with new schema (AI-generation focused)
+        response = {
+            "isAIGenerated": result.is_ai_generated,
             "confidence": result.confidence,
-            "analyzedAt": analyzed_at,
-            "mode": result.mode,
+            "riskLevel": result.risk_level,
+            "detectionMethod": result.detection_method,
             "frameCount": result.frame_count,
-            **(result.details or {}),
+            "processingTime": result.processing_time_seconds,
+            "analyzedAt": analyzed_at,
+            # Include detail breakdown if available
+            "detailBreakdown": result.details or {},
         }
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+
+        logger.info(
+            f"Analysis successful: file={video.filename}, "
+            f"isAIGenerated={result.is_ai_generated}, "
+            f"confidence={result.confidence}"
+        )
+
+        return response
+
+    except HTTPException:
+        # Re-raise HTTP exceptions (validation errors)
+        raise
     except Exception as e:
-        logger.exception("Analysis failed")
-        raise HTTPException(status_code=500, detail="Analysis failed. Please try again.")
+        # Unexpected error
+        logger.exception(f"Unexpected error during analysis: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred during analysis. Please try again.",
+        )
     finally:
+        # Cleanup: always delete temporary file
+        # This is critical to prevent disk space exhaustion
         if file_path.exists():
             try:
                 file_path.unlink()
-            except OSError:
-                pass
+                logger.debug(f"Deleted temporary file: {safe_name}")
+            except OSError as e:
+                logger.warning(f"Could not delete temporary file {safe_name}: {e}")
