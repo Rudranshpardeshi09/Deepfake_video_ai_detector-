@@ -1,12 +1,5 @@
-/**
- * Navigation bar component with responsive mobile menu.
- *
- * Features:
- * - Logo and branding
- * - Tab navigation
- * - Mobile hamburger menu
- * - Sticky positioning on scroll
- */
+// Navigation bar component with responsive mobile menu
+// Provides logo, tabs, and mobile hamburger menu
 
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
@@ -16,12 +9,7 @@ interface NavbarProps {
   setActiveTab: (tab: 'home' | 'detection') => void;
 }
 
-/**
- * Navbar component for main application navigation.
- *
- * Provides responsive design with hamburger menu on mobile devices.
- * Uses Gradient Vibrant theme colors.
- */
+// Navbar component for main application navigation
 const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

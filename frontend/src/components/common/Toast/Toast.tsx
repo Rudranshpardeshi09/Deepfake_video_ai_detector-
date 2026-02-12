@@ -1,9 +1,5 @@
-/**
- * Toast notification component.
- *
- * Displays dismissible notification messages with auto-dismiss.
- * Supports multiple types: success, error, warning, info.
- */
+// Toast notification component
+// Displays dismissible notifications with auto-dismiss
 
 import React, { useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
@@ -13,12 +9,7 @@ interface ToastProps extends ToastType {
   children?: React.ReactNode;
 }
 
-/**
- * Individual toast notification.
- *
- * Displays a message with appropriate styling based on type.
- * Auto-dismisses after duration if specified.
- */
+// Individual toast notification component
 const Toast: React.FC<ToastProps> = ({ id, message, type, duration }) => {
   const { removeToast } = useApp();
 

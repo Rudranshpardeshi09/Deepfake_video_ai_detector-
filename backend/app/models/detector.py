@@ -1,7 +1,4 @@
-"""
-Optional PyTorch deepfake detector (MesoNet-style).
-Load weights from MODEL_WEIGHTS_PATH when available.
-"""
+# Optional PyTorch deepfake detector (MesoNet-style)
 from __future__ import annotations
 
 import logging
@@ -18,7 +15,7 @@ DEVICE = "cpu"
 
 
 def _mesonet(num_classes: int = 1) -> "torch.nn.Module":
-    """MesoNet-style small CNN for 256x256 RGB input."""
+    # MesoNet-style small CNN for 256x256 RGB input
     import torch
     import torch.nn as nn
 
@@ -61,7 +58,7 @@ def _mesonet(num_classes: int = 1) -> "torch.nn.Module":
 
 
 def load_detector(weights_path: str | Path) -> Optional["torch.nn.Module"]:
-    """Load detector from .pth file. Returns None on failure."""
+    # Load detector from .pth file, return None if loading fails
     try:
         import torch
     except ImportError:
@@ -87,7 +84,7 @@ def load_detector(weights_path: str | Path) -> Optional["torch.nn.Module"]:
 
 
 def preprocess_frames(frames: List[np.ndarray]) -> Optional["torch.Tensor"]:
-    """Convert list of BGR frames to normalized tensor [N, 3, H, W] for model."""
+    # Convert BGR frames list to normalized tensor [N,3,H,W]
     try:
         import torch
         import cv2

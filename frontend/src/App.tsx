@@ -1,11 +1,5 @@
-/**
- * Main App component for the AI-generated video detection system.
- *
- * This is the root component that:
- * - Wraps the app with context providers
- * - Manages top-level routing/tabs
- * - Coordinates detection workflow
- */
+// # Main App component for the AI-generated video detection system
+// # Root component: wraps providers, manages tabs, coordinates detection
 
 import React, { useState } from 'react';
 import { AppProvider } from './context/AppContext';
@@ -17,11 +11,8 @@ import Toast from './components/common/Toast/Toast';
 import { useApp } from './context/AppContext';
 import './styles/global.css';
 
-/**
- * Main application content component.
- *
- * Separated from App to use context hooks (context must exist in parent).
- */
+// Main application content component
+// Separated from App so hooks can assume existing context
 const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'home' | 'detection'>('home');
   const { toasts } = useApp();
@@ -67,11 +58,8 @@ const AppContent: React.FC = () => {
   );
 };
 
-/**
- * Root App component with all providers.
- *
- * Wraps the entire application with necessary context providers.
- */
+// Root App component with providers
+// Wraps app with context providers
 const App: React.FC = () => {
   return (
     <AppProvider>

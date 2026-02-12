@@ -1,23 +1,9 @@
-/**
- * Footer component with multiple sections.
- *
- * Features:
- * - Product/company information
- * - Quick links
- * - Social media links
- * - Copyright and credits
- * - Responsive multi-column layout on desktop, stacked on mobile
- */
+// Footer component with multiple sections: info, links, socials
 
 import React from 'react';
 import { Github, Linkedin, Twitter } from 'lucide-react';
 
-/**
- * Footer component for the application.
- *
- * Displays company info, links, and social media.
- * Responsive design stacks vertically on mobile.
- */
+// Footer component displaying info, links and social media
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 

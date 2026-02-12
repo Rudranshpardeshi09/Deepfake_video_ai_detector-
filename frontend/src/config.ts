@@ -1,77 +1,64 @@
-/**
- * Configuration constants for the AI-generated video detection frontend.
- *
- * This file centralizes configuration values including API endpoints, UI constants,
- * and analysis settings. Environment variables (via Vite) can override defaults.
- */
+// Configuration constants for the AI-generated video detection frontend
+// Centralized API endpoints, UI constants, and analysis settings
 
-// ============================================================================
+
 // API CONFIGURATION
-// ============================================================================
 
-/**
- * Base URL for API endpoints.
- * Can be overridden with VITE_API_BASE_URL environment variable.
- * In production, point to your backend URL.
- */
+
+// Base URL for API endpoints; overridable via VITE_API_BASE_URL
 export const API_BASE_URL =
   typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL
     ? String(import.meta.env.VITE_API_BASE_URL).replace(/\/$/, "")
     : "http://localhost:8000";
 
-/** Endpoint for video analysis */
+// Endpoint for video analysis
 export const getAnalyzeUrl = () => `${API_BASE_URL}/api/analyze`;
 
-// ============================================================================
-// VIDEO UPLOAD CONFIGURATION
-// ============================================================================
 
-/** Accepted video file formats */
+// VIDEO UPLOAD CONFIGURATION
+
+
+// Accepted video file formats
 export const SUPPORTED_VIDEO_FORMATS = [".mp4", ".webm", ".mov", ".avi", ".mkv"];
 
-/** Maximum video file size in MB */
+// Maximum video file size in MB
 export const MAX_VIDEO_SIZE_MB = 100;
 
-/** File size in bytes */
+// File size in bytes
 export const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
 
-// ============================================================================
 // ANALYSIS CONFIGURATION
-// ============================================================================
 
-/** Confidence threshold for AI-generation classification (0-1) */
+
+// Confidence threshold for AI-generation classification (0-1)
 export const CLASSIFICATION_THRESHOLD = 0.5;
 
-/** Confidence threshold for "low" risk level */
+// Confidence threshold for "low" risk level
 export const RISK_LEVEL_LOW_THRESHOLD = 0.35;
 
-/** Confidence threshold for "medium" risk level */
+// Confidence threshold for "medium" risk level
 export const RISK_LEVEL_MEDIUM_THRESHOLD = 0.65;
 
-// ============================================================================
-// UI/UX CONSTANTS
-// ============================================================================
 
-/** Default toast notification display duration (ms) */
+// UI/UX CONSTANTS
+
+
+// Default toast notification display duration (ms)
 export const DEFAULT_TOAST_DURATION = 4000;
 
-/** Maximum number of toasts to display simultaneously */
+// Maximum number of toasts to display simultaneously
 export const MAX_TOASTS = 3;
 
-/** Animation duration for transitions (ms) */
+// Animation duration for transitions (ms)
 export const ANIMATION_DURATION = 300;
 
-/** Delay before showing skeleton loaders (prevents flashing) */
+// Delay before showing skeleton loaders (prevents flashing)
 export const SKELETON_DELAY = 200;
 
-// ============================================================================
 // RESPONSIVE BREAKPOINTS
-// ============================================================================
 
-/**
- * Tailwind-compatible breakpoints for responsive design.
- * Used in CSS media queries and shared with TypeScript when needed.
- */
+
+// Tailwind-compatible breakpoints for responsive design
 export const BREAKPOINTS = {
   xs: 320,      // Mobile phones
   sm: 640,      // Small devices
@@ -81,15 +68,11 @@ export const BREAKPOINTS = {
   "2xl": 1536,  // Extra large screens
 };
 
-// ============================================================================
-// THEME CONFIGURATION
-// ============================================================================
 
-/**
- * Rainbow ROY G BIV color palette for vibrant, energetic UI.
- * Uses the full spectrum for visual appeal and distinct color differentiation.
- * Each color has strong saturation and brightness for accessibility.
- */
+// THEME CONFIGURATION
+
+
+// Rainbow ROY G BIV color palette for vibrant UI
 export const RAINBOW_COLORS = {
   red: "#FF0000",       // Pure red
   orange: "#FF7F00",    // Pure orange
@@ -102,11 +85,7 @@ export const RAINBOW_COLORS = {
   cyan: "#00FFFF",      // Cyan
 };
 
-/**
- * Color palette for AI-generated video detection UI.
- * Uses rainbow spectrum for visual dynamism and color transitions.
- * Gradients cycle through the spectrum for animated effects.
- */
+// Color palette for AI-generated video detection UI
 export const THEME_COLORS = {
   // Rainbow gradient for primary UI elements (cycles through spectrum)
   // Used in buttons, headers, gradients with animation
@@ -168,14 +147,11 @@ export const SPECTRUM_COLORS = [
   RAINBOW_COLORS.cyan,
 ];
 
-// ============================================================================
-// RISK LEVEL COLORS
-// ============================================================================
 
-/**
- * Color mapping for risk levels in UI.
- * Used in charts, badges, and indicators.
- */
+// RISK LEVEL COLORS
+
+
+// Color mapping for risk levels in UI
 export const RISK_COLORS = {
   low: "#10B981",    // Green - safe
   medium: "#F59E0B", // Amber - caution

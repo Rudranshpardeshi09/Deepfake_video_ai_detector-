@@ -1,4 +1,4 @@
-"""Application configuration from environment."""
+# Application configuration from environment
 from __future__ import annotations
 
 import os

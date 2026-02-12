@@ -1,19 +1,4 @@
-"""
-Video analysis service: AI-generated video detection.
-
-This module provides the core video analysis pipeline for detecting AI-generated videos.
-It implements a hybrid approach combining fast heuristic detection with optional deep learning
-models for higher accuracy. The heuristic-based approach is always available and provides
-reliable detection in seconds, while the DL model approach (if available) provides enhanced
-accuracy for confirmed detections.
-
-Key detection indicators:
-1. Compression artifacts - AI videos have distinct compression patterns
-2. Frequency domain anomalies - Generative models leave frequency signatures
-3. Optical flow inconsistencies - Unnatural motion patterns
-4. Sharpness variations - Unnatural focus inconsistency
-5. Color distribution entropy - Abnormal color space patterns
-"""
+# Video analysis service: AI-generated video detection
 from __future__ import annotations
 
 import logging
@@ -51,14 +36,8 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+# AnalysisResult: encapsulates final analysis outputs
 class AnalysisResult:
-    """
-    Result of video AI-generation analysis.
-
-    This dataclass encapsulates all results from video analysis including the primary
-    classification (isAIGenerated), confidence score, detection method used, and detailed
-    breakdown of individual detection indicators.
-    """
     is_ai_generated: bool
     confidence: float
     detection_method: str  # "heuristic", "model", or "ensemble"
@@ -69,38 +48,14 @@ class AnalysisResult:
 
 
 def _laplacian_variance(frame: np.ndarray) -> float:
-    """
-    Compute sharpness via Laplacian variance (edge magnitude variance).
-
-    The Laplacian operator detects edges (high-frequency components). Its variance
-    indicates overall sharpness - blurry frames have lower variance, sharp frames higher.
-    AI-generated videos often show inconsistent sharpness across frames.
-
-    Args:
-        frame: Input BGR frame
-
-    Returns:
-        Laplacian variance (higher = sharper)
-    """
+    # Compute Laplacian variance as a sharpness metric for a frame
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     laplacian = cv2.Laplacian(gray, cv2.CV_64F)
     return float(laplacian.var())
 
 
 def _color_histogram_entropy(frame: np.ndarray) -> float:
-    """
-    Compute color distribution entropy in HSV space.
-
-    Entropy measures color distribution complexity. AI-generated videos often have
-    unnaturally uniform or bimodal color distributions. We use HSV because it separates
-    color (Hue, Saturation) from intensity (Value), making color distribution more meaningful.
-
-    Args:
-        frame: Input BGR frame
-
-    Returns:
-        Shannon entropy of 2D HSV histogram (higher = more colors present)
-    """
+    # Compute Shannon entropy of 2D HSV color histogram
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     # Use histogram bins from constants
     hist = cv2.calcHist([hsv], [0, 1], None, [HISTOGRAM_BINS_H, HISTOGRAM_BINS_S], [0, 180, 0, 256])
@@ -116,21 +71,7 @@ def _color_histogram_entropy(frame: np.ndarray) -> float:
 
 
 def _temporal_difference(frames: List[np.ndarray]) -> np.ndarray:
-    """
-    Compute frame-to-frame temporal differences.
-
-    Measures pixel-level differences between consecutive frames. This captures motion
-    in the video. AI-generated videos often show unnatural motion patterns:
-    - Too static (very low differences) - faces should animate naturally
-    - Too jittery (very high differences) - indicates generation glitches
-    - Inconsistent motion (high variance in differences)
-
-    Args:
-        frames: List of consecutive BGR frames
-
-    Returns:
-        Array of mean pixel differences for each frame pair
-    """
+    # Compute mean pixel differences between consecutive frames
     if len(frames) < 2:
         return np.array([0.0])
 
@@ -151,21 +92,7 @@ def _temporal_difference(frames: List[np.ndarray]) -> np.ndarray:
 
 
 def _compression_artifacts_score(frames: List[np.ndarray]) -> float:
-    """
-    Detect compression artifacts common in AI-generated videos.
-
-    Video compression creates 8x8 or 16x16 blocks (depending on codec).
-    AI-generated videos often have unnatural block boundaries or patterns.
-
-    We detect this by looking at edge density around block boundaries.
-    AI videos may have artificial block patterns that don't match natural content.
-
-    Args:
-        frames: List of frames to analyze
-
-    Returns:
-        Score [0, 1] indicating likelihood of compression artifacts
-    """
+    # Detect block-like compression artifacts across frames
     if not frames:
         return 0.0
 
@@ -211,19 +138,7 @@ def _compression_artifacts_score(frames: List[np.ndarray]) -> float:
 
 
 def _frequency_anomaly_score(frames: List[np.ndarray]) -> float:
-    """
-    Detect frequency domain anomalies common in AI-generated content.
-
-    Generative models (diffusion, GANs, etc.) leave characteristic patterns in
-    frequency space due to their architecture. We detect abnormally high or low
-    frequency components that indicate synthetic generation.
-
-    Args:
-        frames: List of frames to analyze
-
-    Returns:
-        Score [0, 1] indicating likelihood of frequency anomalies
-    """
+    # Detect frequency-domain anomalies using FFT-based heuristics
     if not frames:
         return 0.0
 
@@ -273,31 +188,35 @@ def _frequency_anomaly_score(frames: List[np.ndarray]) -> float:
     return float(np.mean(frequency_scores)) if frequency_scores else 0.0
 
 
+def _contains_human(frames: List[np.ndarray], required_faces: int = 1) -> bool:
+    # Quick face-presence check using OpenCV Haar cascade
+    # Library
+    try:
+        import cv2 as _cv2
+    except Exception:
+        return False
+
+    # Classifier
+    cascade_path = _cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    face_cascade = _cv2.CascadeClassifier(cascade_path)
+    if face_cascade.empty():
+        return False
+
+    # Scan frames
+    count = 0
+    for f in frames:
+        gray = _cv2.cvtColor(f, _cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        if len(faces) > 0:
+            count += len(faces)
+        if count >= required_faces:
+            return True
+
+    return False
+
+
 def heuristic_score(frames: List[np.ndarray]) -> Tuple[float, Dict[str, float]]:
-    """
-    Compute AI-generation detection score from heuristic features.
-
-    This deterministic pipeline analyzes multiple frame-level features and combines
-    them into a final confidence score. No randomness - same frames always produce
-    the same score, making results reproducible and debuggable.
-
-    Detection features and their weights:
-    - Sharpness consistency (35%): AI videos often have inconsistent focus
-    - Compression artifacts (25%): Generative models leave distinct block patterns
-    - Optical flow (20%): Unnatural motion or jitter indicates synthesis
-    - Frequency anomalies (20%): Frequency domain signatures of generation
-
-    Args:
-        frames: List of BGR frames extracted from video
-
-    Returns:
-        Tuple of:
-        - Confidence score [0, 1] (higher = more likely AI-generated)
-        - Dictionary of individual feature scores for explainability
-
-    Raises:
-        ValueError: If no valid frames provided
-    """
+   
     if not frames:
         raise ValueError("No frames provided for heuristic analysis")
 
@@ -391,19 +310,7 @@ def heuristic_score(frames: List[np.ndarray]) -> Tuple[float, Dict[str, float]]:
 
 
 def _run_model_inference(frames: List[np.ndarray], model_path: str) -> float:
-    """
-    Run pre-trained deep learning model on frames.
-
-    Attempts to load a PyTorch model from the specified path and perform inference.
-    If PyTorch is not installed or model loading fails, returns -1.0 to indicate failure.
-
-    Args:
-        frames: List of frames for inference
-        model_path: Path to .pth model weights
-
-    Returns:
-        Model confidence score [0, 1], or -1.0 if inference fails
-    """
+    # Run pre-trained PyTorch model on frames, return score or -1.0 on failure
     try:
         import torch
     except ImportError:
@@ -450,26 +357,7 @@ def _run_model_inference(frames: List[np.ndarray], model_path: str) -> float:
 
 
 def analyze_video(video_path: str | Path) -> AnalysisResult:
-    """
-    Perform complete AI-generation detection analysis on a video.
-
-    This is the main entry point for video analysis. It orchestrates the full pipeline:
-    1. Extract frames from video
-    2. Run heuristic detection (fast, always available)
-    3. Optionally run deep learning model (if available)
-    4. Combine scores if both methods succeeded
-    5. Classify and return results
-
-    Args:
-        video_path: Path to video file
-
-    Returns:
-        AnalysisResult with classification, confidence, and details
-
-    Raises:
-        VideoProcessingError: If video cannot be opened/processed
-        NoFramesExtractedError: If no frames could be extracted
-    """
+    # Main analysis pipeline: extract frames, heuristic, optional model, combine
     start_time = time.time()
 
     try:
@@ -482,6 +370,20 @@ def analyze_video(video_path: str | Path) -> AnalysisResult:
         frame_count = len(frames)
 
         logger.info(f"Starting analysis of {frame_count} frames from video")
+
+        # Human
+        has_human = _contains_human(frames)
+        if not has_human:
+            processing_time = time.time() - start_time
+            return AnalysisResult(
+                is_ai_generated=False,
+                confidence=0.0,
+                detection_method="no_human",
+                frame_count=frame_count,
+                risk_level=get_risk_level(0.0),
+                processing_time_seconds=round(processing_time, 2),
+                details={"humans_detected": 0},
+            )
 
         # Step 2: Run heuristic detection (always available)
         heuristic_confidence, heuristic_details = heuristic_score(frames)

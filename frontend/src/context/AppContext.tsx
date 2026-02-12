@@ -1,9 +1,5 @@
-/**
- * Global application context for state management.
- *
- * This context stores app-wide state like toasts, loading states, and
- * analysis results that need to be accessible from anywhere in the app.
- */
+// Global application context for state management
+// Stores toasts, video state, analysis results
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { Toast, VideoDetails, DetectionResult } from '../types';
 
@@ -27,12 +23,7 @@ interface AppContextType {
 // Create context with undefined default (enforces provider usage)
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-/**
- * Provider component that wraps the app with global state.
- *
- * Manages toasts, video state, and analysis results that are shared
- * across multiple components.
- */
+// Provider component that wraps the app with global state
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [currentVideo, setCurrentVideo] = useState<VideoDetails | null>(null);
@@ -80,12 +71,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 };
 
-/**
- * Hook to use the app context.
- *
- * Provides access to global app state and functions.
- * Must be called inside AppProvider.
- */
+// Hook to access global app context; requires AppProvider
 export const useApp = (): AppContextType => {
   const context = useContext(AppContext);
 

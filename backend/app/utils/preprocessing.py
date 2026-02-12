@@ -1,10 +1,4 @@
-"""
-Frame preprocessing and normalization utilities.
-
-This module handles all frame-level preprocessing required before analysis,
-including resizing, normalization, and color space conversions.
-These utilities ensure consistency across different detection methods.
-"""
+# Frame preprocessing and normalization utilities
 from __future__ import annotations
 
 import logging
@@ -25,20 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def resize_frame(frame: np.ndarray, height: int = MODEL_INPUT_HEIGHT, width: int = MODEL_INPUT_WIDTH) -> np.ndarray:
-    """
-    Resize a frame to specified dimensions using bilinear interpolation.
-
-    We use bilinear interpolation as a good balance between quality and speed.
-    This is useful for feeding frames into neural networks that expect fixed input sizes.
-
-    Args:
-        frame: Input BGR frame (numpy array)
-        height: Target height in pixels
-        width: Target width in pixels
-
-    Returns:
-        Resized frame (BGR)
-    """
+    # Resize frame to target (height,width) using bilinear interpolation
     # cv2.resize uses (width, height) ordering, not (height, width)
     # This is opposite to numpy/matrix convention, so we swap them
     return cv2.resize(frame, (width, height), interpolation=cv2.INTER_LINEAR)
@@ -49,22 +30,7 @@ def normalize_frame(
     mean: Tuple[float, float, float] = IMAGENET_MEAN,
     std: Tuple[float, float, float] = IMAGENET_STD,
 ) -> np.ndarray:
-    """
-    Normalize frame using ImageNet statistics.
-
-    This normalization is standard for transfer learning with models trained on ImageNet.
-    It converts pixel values from [0, 255] to approximately normalized distribution.
-
-    The formula for each channel: normalized = (pixel - mean) / std
-
-    Args:
-        frame: Input BGR frame with pixel values in [0, 255]
-        mean: Mean values for normalization (RGB order, we handle BGR conversion)
-        std: Standard deviation values for normalization (RGB order)
-
-    Returns:
-        Normalized frame as float32 with values approximately in [-1, 1]
-    """
+    # Normalize frame using ImageNet mean/std (returns float32 RGB)
     # Convert to float first to avoid integer overflow
     # Divide by 255 to get values in [0, 1] range
     frame_float = frame.astype(np.float32) / 255.0
@@ -91,20 +57,7 @@ def preprocess_frame(
     target_height: int = MODEL_INPUT_HEIGHT,
     target_width: int = MODEL_INPUT_WIDTH,
 ) -> np.ndarray:
-    """
-    Complete preprocessing pipeline for a single frame.
-
-    This chains all preprocessing steps: resizing and normalization.
-    Used before feeding frames to neural networks.
-
-    Args:
-        frame: Input BGR frame (any size)
-        target_height: Target height for resizing
-        target_width: Target width for resizing
-
-    Returns:
-        Preprocessed frame (float32, normalized, RGB channel order)
-    """
+    # Full preprocessing: resize then normalize
     # Step 1: Resize to target dimensions
     # This ensures all frames have consistent size for batch processing
     resized = resize_frame(frame, target_height, target_width)
@@ -121,21 +74,7 @@ def preprocess_frames_batch(
     target_height: int = MODEL_INPUT_HEIGHT,
     target_width: int = MODEL_INPUT_WIDTH,
 ) -> np.ndarray:
-    """
-    Preprocess multiple frames into a batch array.
-
-    This is efficient for processing all frames at once (vectorized operation).
-    Converts list of frames into a single numpy array of shape [N, H, W, 3].
-
-    Args:
-        frames: List of BGR frames (numpy arrays)
-        target_height: Target height for resizing
-        target_width: Target width for resizing
-
-    Returns:
-        Batch array of shape (N, height, width, 3) with float32 values
-        Values are normalized to approximately [-1, 1] range
-    """
+    # Preprocess list of frames into a stacked batch array
     if not frames:
         return np.array([], dtype=np.float32)
 
@@ -162,69 +101,22 @@ def preprocess_frames_batch(
 
 
 def frame_to_rgb(frame: np.ndarray) -> np.ndarray:
-    """
-    Convert BGR frame to RGB.
-
-    OpenCV uses BGR format by default, but most visualization and ML tools expect RGB.
-    This simple utility makes the conversion explicit and avoids mistakes.
-
-    Args:
-        frame: Input frame in BGR format
-
-    Returns:
-        Frame in RGB format
-    """
+    # Convert BGR frame to RGB
     return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
 
 def frame_to_grayscale(frame: np.ndarray) -> np.ndarray:
-    """
-    Convert BGR frame to grayscale.
-
-    Grayscale conversion is useful for certain analysis features like edge detection
-    and sharpness measurement, as they don't require color information.
-
-    Args:
-        frame: Input frame in BGR format
-
-    Returns:
-        Grayscale frame (single channel)
-    """
+    # Convert BGR frame to grayscale
     return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
 def frame_to_hsv(frame: np.ndarray) -> np.ndarray:
-    """
-    Convert BGR frame to HSV color space.
-
-    HSV is useful for color distribution analysis because it separates color
-    information (Hue) from intensity (Value), making it more perceptually
-    meaningful than RGB for certain detection tasks.
-
-    Args:
-        frame: Input frame in BGR format
-
-    Returns:
-        Frame in HSV color space
-    """
+    # Convert BGR frame to HSV
     return cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
 
 def normalize_pixel_values(frame: np.ndarray, target_min: float = 0.0, target_max: float = 1.0) -> np.ndarray:
-    """
-    Normalize pixel values to a specific range.
-
-    This is useful for standardizing frame intensity across different videos
-    (e.g., some videos are brighter or darker than others).
-
-    Args:
-        frame: Input frame (can be any data type)
-        target_min: Minimum value of output range
-        target_max: Maximum value of output range
-
-    Returns:
-        Normalized frame as float32 in specified range
-    """
+    # Normalize pixel values to a target range
     frame_float = frame.astype(np.float32)
 
     # Min-max normalization: (x - min) / (max - min) * (target_max - target_min) + target_min

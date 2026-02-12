@@ -1,10 +1,4 @@
-"""
-Application-wide constants for AI-generated video detection.
-
-This file centralizes all hardcoded configuration values to avoid
-magic numbers scattered throughout the codebase. This makes it easier
-to tune detection parameters and understand thresholds.
-"""
+# Application-wide constants for AI-generated video detection
 from __future__ import annotations
 
 # ============================================================================

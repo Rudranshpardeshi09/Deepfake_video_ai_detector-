@@ -1,13 +1,5 @@
-/**
- * Detection page component - main analysis interface.
- *
- * Features:
- * - Video file upload with drag-and-drop
- * - Video preview player
- * - Analysis trigger
- * - Results display with risk level and confidence
- * - Detailed breakdown of detection indicators
- */
+// Detection page component - main analysis interface
+// Upload, preview, analyze, and display results
 
 import React from 'react';
 import { Play, Upload, AlertCircle } from 'lucide-react';
@@ -17,15 +9,7 @@ import { useAnalysis } from '../../../hooks/useAnalysis';
 import { useVideoCompression } from '../../../hooks/useVideoCompression';
 import type { VideoDetails } from '../../../types';
 
-/**
- * Detection component for video analysis workflow.
- *
- * Manages the complete user flow:
- * 1. File upload/selection
- * 2. Video preview
- * 3. Analysis trigger
- * 4. Results display
- */
+// Detection component for video analysis workflow
 const Detection: React.FC = () => {
   const { video, selectVideo, clearVideo } = useVideoUpload();
   const { analyzeVideo, isLoading } = useAnalysis();

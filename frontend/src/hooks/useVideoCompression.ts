@@ -1,15 +1,5 @@
-/**
- * useVideoCompression - Hook for client-side video compression using FFmpeg.wasm
- *
- * Provides video compression capability using FFmpeg in the browser.
- * Allows users to reduce video file size before uploading for analysis.
- *
- * Features:
- * - Compress video at specified quality levels (80%, 60%, 40%)
- * - Client-side processing (no server upload until compression complete)
- * - Progress tracking for compression operation
- * - Error handling and fallback if FFmpeg.wasm is unavailable
- */
+// Hook for client-side video compression using FFmpeg.wasm
+// Provides compression, progress, and error handling
 
 import { useState, useCallback } from 'react';
 
@@ -25,19 +15,7 @@ export interface UseVideoCompressionReturn {
   isAvailable: boolean;
 }
 
-/**
- * Hook for video compression using FFmpeg.wasm.
- * Provides client-side compression to reduce video file sizes before upload.
- *
- * Quality levels:
- * - 80: High quality (20-30% size reduction)
- * - 60: Medium quality (40-50% size reduction)
- * - 40: Low quality (60-70% size reduction)
- *
- * Note: FFmpeg.wasm requires:
- * - npm install @ffmpeg/ffmpeg @ffmpeg/util
- * - Enable SharedArrayBuffer in browser (requires COOP/COEP headers)
- */
+// Hook for video compression using FFmpeg.wasm with quality presets
 export const useVideoCompression = (): UseVideoCompressionReturn => {
   const [progress, setProgress] = useState<CompressionProgress>({
     percentage: 0,

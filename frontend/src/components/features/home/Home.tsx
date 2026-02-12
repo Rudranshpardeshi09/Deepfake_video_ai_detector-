@@ -1,11 +1,5 @@
-/**
- * Home page component - landing/marketing section.
- *
- * Features:
- * - Hero section with call-to-action
- * - Feature showcase
- * - How it works explanation
- */
+// Home page component - landing and marketing section
+// Contains hero, features, and how-it-works
 
 import React from 'react';
 import { Shield, Zap, CheckCircle, AlertTriangle } from 'lucide-react';
@@ -14,14 +8,7 @@ interface HomeProps {
   onNavigate: () => void;
 }
 
-/**
- * Home component displaying landing page content.
- *
- * Sections:
- * 1. Hero section with CTA button
- * 2. Features showcase
- * 3. How it works
- */
+// Home component displaying landing content and CTA
 const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   return (
     <div

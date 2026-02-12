@@ -1,11 +1,7 @@
-/**
- * Hook for managing video analysis workflow.
- *
- * Handles the complete analysis pipeline: file validation, API calls,
- * error handling, and result management.
- */
+// Hook for managing video analysis workflow
+// Handles validation, API calls, errors, and result state
 import { useCallback, useState } from 'react';
-import { getAnalyzeUrl, MAX_VIDEO_SIZE_BYTES, SUPPORTED_VIDEO_FORMATS } from '../config';
+import { getAnalyzeUrl } from '../config';
 import type { DetectionResult, VideoDetails } from '../types';
 import { useApp } from '../context/AppContext';
 
@@ -15,12 +11,7 @@ interface UseAnalysisReturn {
   error: string | null;
 }
 
-/**
- * Hook to handle video analysis.
- *
- * Provides a clean interface for uploading a video and getting analysis results.
- * Handles all error cases and displays user-friendly messages via toasts.
- */
+// Hook to handle video analysis and expose analyzeVideo
 export const useAnalysis = (): UseAnalysisReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -1,10 +1,4 @@
-"""
-Video processing utility functions.
-
-This module provides low-level video frame extraction and processing functions.
-It abstracts away OpenCV complexity and provides error handling for common
-video processing issues.
-"""
+# Video processing utility functions
 from __future__ import annotations
 
 import logging
@@ -25,28 +19,7 @@ def extract_frames(
     frames_per_second: float = DEFAULT_FRAMES_PER_SECOND,
     max_frames: int = DEFAULT_MAX_FRAMES,
 ) -> Tuple[List[np.ndarray], float, int]:
-    """
-    Extract sampled frames from a video file.
-
-    This function samples frames at regular intervals to reduce processing time
-    while capturing sufficient temporal diversity. Frames are returned in BGR format
-    (OpenCV's default) to maintain consistency with the rest of the pipeline.
-
-    Args:
-        video_path: Path to video file
-        frames_per_second: Sampling rate (e.g., 1.0 = extract 1 frame per second)
-        max_frames: Maximum number of frames to extract (prevents excessive memory use)
-
-    Returns:
-        Tuple of:
-        - List of BGR frames (as numpy arrays)
-        - Video FPS (frames per second of original video)
-        - Total number of frames in original video
-
-    Raises:
-        VideoProcessingError: If video cannot be opened or read
-        NoFramesExtractedError: If no valid frames could be extracted
-    """
+    # Extract sampled frames from a video file
     video_path_str = str(video_path)
 
     # Use cv2.VideoCapture to open the video file
@@ -112,21 +85,7 @@ def extract_frames(
 
 
 def get_video_metadata(video_path: str | Path) -> dict:
-    """
-    Extract metadata from a video file without loading all frames.
-
-    This is useful for quick validation and logging without the
-    overhead of frame extraction.
-
-    Args:
-        video_path: Path to video file
-
-    Returns:
-        Dictionary with keys: fps, total_frames, width, height, codec
-
-    Raises:
-        VideoProcessingError: If video cannot be opened
-    """
+    # Extract metadata from a video file without loading frames
     video_path_str = str(video_path)
     cap = cv2.VideoCapture(video_path_str)
 
@@ -155,18 +114,7 @@ def get_video_metadata(video_path: str | Path) -> dict:
 
 
 def is_valid_video_format(filename: str) -> bool:
-    """
-    Check if filename has a supported video format extension.
-
-    We validate extensions early to avoid OpenCV hanging on malformed files.
-    This is a quick check before attempting to open the file.
-
-    Args:
-        filename: Original filename from upload
-
-    Returns:
-        True if extension is in supported formats, False otherwise
-    """
+    # Check if filename has supported video extension
     # Supported video formats (lowercase extensions)
     supported_formats = {".mp4", ".webm", ".mov", ".avi", ".mkv", ".flv", ".wmv", ".m4v"}
 
@@ -183,22 +131,7 @@ def validate_video_file(
     file_path: str | Path,
     max_size_mb: int | None = None,
 ) -> bool:
-    """
-    Validate that a file is a readable video file.
-
-    This performs basic checks before expensive frame extraction.
-    Checks file existence, size, and ability to open as video.
-
-    Args:
-        file_path: Path to file to validate
-        max_size_mb: Optional maximum file size in MB
-
-    Returns:
-        True if file is valid, False otherwise
-
-    Raises:
-        VideoProcessingError: If validation fails with specific reason
-    """
+    # Validate file exists, size, and can be opened as video
     path = Path(file_path)
 
     # Check file exists

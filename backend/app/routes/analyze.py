@@ -1,10 +1,4 @@
-"""
-Video upload and AI-generation analysis API.
-
-This module defines the REST API endpoints for video upload and detection.
-It handles file validation, temporary storage, and returns analysis results
-in a user-friendly JSON format.
-"""
+# Video upload and AI-generation analysis API
 from __future__ import annotations
 
 import logging
@@ -25,46 +19,8 @@ MAX_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024
 
 
 @router.post("/analyze")
+# Analyze uploaded video file
 async def analyze_uploaded_video(video: UploadFile = File(..., description="Video file to analyze")):
-    """
-    Upload a video and analyze it for AI-generated content.
-
-    This endpoint accepts video uploads and returns a comprehensive analysis result
-    including confidence score, risk level (low/medium/high), and per-indicator scores.
-
-    Request:
-        - Content-Type: multipart/form-data
-        - Parameter: video (file upload, MP4/WebM/MOV/AVI/MKV, max 100MB)
-
-    Response:
-        {
-            "isAIGenerated": bool,           # Primary classification result
-            "confidence": float,              # Confidence [0.0-1.0]
-            "riskLevel": "low|medium|high",  # Human-readable risk indicator
-            "detectionMethod": "heuristic|model|ensemble",  # Which method was used
-            "frameCount": int,                # Number of frames analyzed
-            "processingTime": float,          # Analysis time in seconds
-            "analyzedAt": string,             # ISO 8601 timestamp
-            "detailBreakdown": {              # Detailed indicator scores
-                "sharpness_score": float,
-                "compression_score": float,
-                "optical_flow_score": float,
-                "frequency_score": float,
-                ...
-            }
-        }
-
-    Status Codes:
-        - 200: Success - analysis complete
-        - 400: Bad request - invalid file or format
-        - 500: Server error - analysis failed
-
-    Args:
-        video: Uploaded video file
-
-    Raises:
-        HTTPException: 400 if file is invalid, 500 if analysis fails
-    """
     # Validate file exists and has content
     if not video.filename:
         raise HTTPException(status_code=400, detail="No file provided")

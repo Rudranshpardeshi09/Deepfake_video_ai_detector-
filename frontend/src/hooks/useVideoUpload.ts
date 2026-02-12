@@ -1,9 +1,5 @@
-/**
- * Hook for managing video file uploads and validation.
- *
- * Handles file selection, validation, preview URL generation,
- * and error states for the upload component.
- */
+// Hook for managing video file uploads and validation
+// Handles file selection, validation, and preview URL generation
 import { useCallback, useState } from 'react';
 import { MAX_VIDEO_SIZE_BYTES, SUPPORTED_VIDEO_FORMATS } from '../config';
 import type { VideoDetails } from '../types';
@@ -16,12 +12,7 @@ interface UseVideoUploadReturn {
   isValidFile: (file: File) => boolean;
 }
 
-/**
- * Hook to handle video file uploads.
- *
- * Validates file type and size, generates preview URL using blob API.
- * Returns clean interface for managing video state.
- */
+// Hook to handle video file uploads and state
 export const useVideoUpload = (): UseVideoUploadReturn => {
   const [video, setVideo] = useState<VideoDetails | null>(null);
   const [error, setError] = useState<string | null>(null);

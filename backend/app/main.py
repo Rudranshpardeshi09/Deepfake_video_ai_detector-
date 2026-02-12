@@ -1,8 +1,4 @@
-"""
-DeepGuard AI Backend - FastAPI application.
-
-Serves /api/analyze (video upload + deepfake analysis) and /api/health.
-"""
+# DeepGuard AI Backend - FastAPI application
 from __future__ import annotations
 
 import logging
@@ -37,14 +33,14 @@ app.include_router(analyze_router)
 
 
 @app.get("/api/health")
+# Health check endpoint
 def health():
-    """Health check for load balancers and frontend."""
     return {"status": "ok", "service": "deepguard-backend"}
 
 
 @app.get("/")
+# Root info
 def root():
-    """Root redirect or info."""
     return {"service": "DeepGuard AI Backend", "docs": "/docs"}
 
 
